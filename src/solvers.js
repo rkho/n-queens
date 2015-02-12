@@ -16,26 +16,13 @@
 window.findNRooksSolution = function(n) {
   var board = new Board({n:n});
   var solution = board.rows();
+  var colCount = 0;
+  var rowCount = 0;
 
-  var placeRooks = function(rowNum) {
-    if (rowNum === n){
-      return;
-    }
-
-    for (var i = 0; i < solution[rowNum].length; i++){
-      board.togglePiece(rowNum, i);
-      console.log(board.get(0));
-      console.log(solution);
-      if (board.hasAnyRooksConflicts){
-        board.togglePiece(rowNum, i);
-      } else {
-        placeRooks(rowNum+1);
-      }
-    }
-
-  };
-
-  placeRooks(0);
+  for (rowCount; rowCount < n; rowCount++){
+    board.togglePiece(rowCount, colCount);
+    colCount++;
+  }
 
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution;
@@ -45,35 +32,38 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  // var solution = [];
-  // var solutionCount = solution.length; //fixme
+  var solutionCount = 0;
+  var board = new Board({n:n});
 
-  // var superChecker = function(rowNum, colNum){
-  //   return this.hasRowConflictAt(rowNum) || this.hasColConflictAt(colNum) || this.hasMajorDiagonalConflictAt(colNum) || this.hasMinorDiagonalConflictAt(colNum);
-  // };
+  var checkRows = function(row){
+    // Iterate across all available columns
+    for (var i = 0; i < n; i++){
+      // Toggle a piece!
+      board.togglePiece(row, i);
+      // Immediately check to see if adding this piece causes any conflicts at all.
+      if (board.hasAnyRooksConflicts()){
+        // If it does, toggle it off right away!
+        board.togglePiece(row, i);
+        // After that, continue the loop!
+        continue;
+      } else {
+        // If there are no conflicts, check to see if we are on the last row!
+        if (row === (n - 1)){
+          // If it is, success! A solution! Add one to the solutionCount, and un-toggle
+          // this piece.
+          solutionCount++;
+          board.togglePiece(row, i);
+        } else {
+          // Otherwise, let's go down a layer.
+          checkRows(row + 1);
+          // After it's done recursing through, we want to un-toggle this piece anyways for future iterations.
+          board.togglePiece(row, i);
+        }
+      }
+    }
+  };
 
-  // var placeRooks = function(rowNum){
-  //   if (rowNum >= n){
-  //     return;
-  //   }
-
-  //   var tempRow = [];
-  //   var rowNum = rowNum || 0;
-  //   for (var i=0; i<n; i++){
-  //     tempRow[i] = 0;
-  //   }
-  //   for (var j=0; j<tempRow.length; j++){
-  //     tempRow[j] = 1;
-  //     if (superChecker(rowNum, j) === true){
-  //       tempRow[j] = 0;
-  //     } else if (superChecker(rowNum, j) === false){
-  //       rowNum++;
-  //       placeRooks(rowNum);
-  //     }
-  //   }
-  //   solution[rowNum] = tempRow;
-  // };
-
+  checkRows(0);
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
