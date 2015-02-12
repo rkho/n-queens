@@ -92,6 +92,9 @@
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
       var n = this.get('n');
+      if (n === 1){
+        return false;
+      }
 
       for (var i=0; i<n; i++) {
         if (this.hasRowConflictAt(i)) {
@@ -110,6 +113,9 @@
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
       var n = this.get('n');
+      if (n === 1){
+        return false;
+      }
       var count = 0;
 
       for (var i = 0; i < n; i++){
